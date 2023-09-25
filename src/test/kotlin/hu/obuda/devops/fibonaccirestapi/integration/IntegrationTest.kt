@@ -2,6 +2,8 @@ package hu.obuda.devops.fibonaccirestapi.integration
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.RestClientException
@@ -12,19 +14,26 @@ class IntegrationTest {
 
     var restTemplate = RestTemplate()
 
-    @Test
-    fun callFibonacciEndpoint() {
+    @ParameterizedTest
+    @CsvSource(
+            "10, 55",
+            "1, 1",
+            "2, 1",
+            "4, 3",
+            "46, 1836311903"
+    )
+    fun callFibonacciEndpoint(value: Int, expected: Int) {
         // given
 
         // when
         val entity = restTemplate.getForEntity(
-            "http://localhost:8080/fibonacci?n=1",
+                "http://localhost:8080/fibonacci?n=$value",
             String::class.java
         )
 
         // then
         Assertions.assertEquals(HttpStatus.OK, entity.statusCode)
-        Assertions.assertEquals("0", entity.body)
+        Assertions.assertEquals(expected.toString(), entity.body)
     }
 
     @Test
